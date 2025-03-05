@@ -50,13 +50,22 @@ FROM EMPLOYEES, DEPARTMENTS; --NU SE STIE DACA COLOANELE DIN SELECT TIN DE TABEL
 
 --EXERCITII--------------------------------------------
 
+--3--
+desc employees;
+
 --3
 DESC EMPLOYEES; -- COMANDA NU ESTE RECUNOSCUTA IN DATAGRIP, SE POATE TESTA IN ORACLE SQL DEVELOPER INSA
+
+--4--
+select * from employees;
 
 --4
 SELECT * FROM EMPLOYEES; -- * AJUTA LA AFISAREA TUTUROR COLOANELOR TABELULUI/TABELELOR DIN CLAUZA FROM
 
 SELECT *, EMPLOYEE_ID FROM EMPLOYEES; -- EROARE: DACA S-A UTILIZAT * IN CLAUZA SELECT, ATUNCI NU SE POT ADAUGA SI ALTE CAMPURI PARTICULARE IN CLAUZA
+
+--5--
+select employee_id, first_name, last_name, job_id, hire_date from employees;
 
 --5
 SELECT
@@ -66,12 +75,18 @@ SELECT
     HIRE_DATE
 FROM EMPLOYEES;
 
+--6--
+select job_id from employees;
+
 --6
 SELECT DISTINCT JOB_ID
 FROM EMPLOYEES;
 
 SELECT UNIQUE JOB_ID
 FROM EMPLOYEES;
+
+--7--
+select first_name || ', ' || job_id as "Angajat si titlu" from employees;
 
 --7
 SELECT
@@ -80,11 +95,17 @@ SELECT
                                     --CU GHILIMELE SE DEFINESC DOAR ALIAS-URILE
 FROM EMPLOYEES;
 
+--8--
+select first_name, salary from employees where salary >= 2850;
+
 --8
 SELECT
     FIRST_NAME, SALARY
 FROM EMPLOYEES
 WHERE SALARY >= 2850;
+
+--9--
+select first_name, department_id from employees where employee_id = 104;
 
 --9
 SELECT
@@ -93,16 +114,26 @@ SELECT
 FROM EMPLOYEES
 WHERE EMPLOYEE_ID = 104;
 
+--10--
+select first_name, salary from employees where salary not between 1500 and 2850;
+
+
 --10
 SELECT FIRST_NAME, SALARY
 FROM EMPLOYEES
 WHERE SALARY NOT BETWEEN 1500 AND 2850;
 -- OPERATORUL BETWEEN ESTE FOLOSIT PENTRU VERIFICAREA APARTENENTEI UNEI VALORI LA UN INTERVAL INCHIS
 
+--11--
+select first_name, job_id, hire_date from employees where hire_date between '20 Februarie 1987' and '1 Mai 1989';
+
 --11
 SELECT FIRST_NAME, JOB_ID, HIRE_DATE
 FROM EMPLOYEES
 WHERE HIRE_DATE BETWEEN '20-FEB-1987' AND '01-MAY-1989'; -- EXEMPLU DE CONVERSIE IMPLICITA DIN SIR DE CARACTERE IN DATA CALENDARISTICA
+
+--12--
+select first_name, department_id from employees where department_id between 10 and 30;
 
 --12
 SELECT FIRST_NAME, DEPARTMENT_ID
@@ -111,13 +142,19 @@ WHERE DEPARTMENT_ID IN (10, 30)
 ORDER BY FIRST_NAME;
 -- OPERATORUL IN ESTE FOLOSIT PENTRU VERIFICAREA APARTENENTEI UNEI VALORI LA O MULTIME
 
+--13--
+select first_name as "Angajat", salary*12 as "Salariu anual" from employees where salary >= 1500 and department_id in (10, 30);
+
 --13
 SELECT
     FIRST_NAME AS ANGAJAT,
     SALARY * 12 "SALARIU ANUAL"
 FROM EMPLOYEES
 WHERE (SALARY >= 1500) AND
-        (DEPARTMENT_ID IN (10, 30))
+        (DEPARTMENT_ID IN (10, 30));
+
+--14--
+select first_name, job_id, manager_id from employees where manager_id is null;
 
 --14
 SELECT 
@@ -135,6 +172,9 @@ WHERE MANAGER_ID IS NOT NULL;
     -- TRUE OR UNKNOWN -> TRUE
     -- TRUE AND UNKNOWN -> UNKNOWN
 
+--15--
+select first_name, salary, commission_pct from employees where commission_pct is not null order by salary desc, commission_pct desc;
+
 --15
 SELECT
     EMPLOYEE_ID, SALARY, COMMISSION_PCT
@@ -148,16 +188,21 @@ ORDER BY SALARY DESC, COMMISSION_PCT DESC;
 --LA SORTARE DESCRESCATOARE, NULL APARE INAINTEA VALORILOR NUMERICE
 --LA SORTARE CRESCATOARE, NULL APARE DUPA VALORILE NUMERICE
 
-
 -- LIKE ESTE FOLOSIT PENTRU A VERIFICA DACA UN STRING RESPECTA UN ANUMIT PATTERN
 
 -- STRING CU 3 CARACTERE, UNDE AL 3-LEA CARACTER ESTE 'B' (__B)
 -- STRING CU CEL PUTIN 3 CARACTERE, UNDE AL 2-LEA CARACTER ESTE 'B' (_B_%)
 
+--16--
+select first_name from employees where upper(first_name) like '__A%';
+
 --16
 SELECT FIRST_NAME
 FROM EMPLOYEES
 WHERE UPPER(FIRST_NAME) LIKE '__A%';
+
+--17--
+select first_name from employees where lower(first_name) like '%l%l%' and (department_id = 50 or manager_id = 102);
 
 --17
 SELECT FIRST_NAME
@@ -165,9 +210,12 @@ FROM EMPLOYEES
 WHERE UPPER(FIRST_NAME) LIKE '%L%L%' AND
         (DEPARTMENT_ID = 50 OR MANAGER_ID = 102);
 
+--18--
+select first_name, job_id, salary from employees where (lower(job_id) like '%clerk%' or lower(job_id) like 'rep') and salary not in (1000, 2000, 3000);
+
 --18
 SELECT FIRST_NAME, JOB_ID, SALARY
 FROM EMPLOYEES
 WHERE UPPER(JOB_ID) LIKE '%CLERK%'
-        OR UPPER(JOB_ID) LIKE '%REP%' AND
-        (SALARY NOT IN (1000, 2000, 3000));
+    OR UPPER(JOB_ID) LIKE '%REP%' AND
+    (SALARY NOT IN (1000, 2000, 3000));
