@@ -1,10 +1,16 @@
 -- 1. Să se listeze job-urile angajaților care lucrează în departamentul 30.
 SELECT
-    *
-FROM EMPLOYEES;
+    J.JOB_TITLE
+FROM EMPLOYEES E
+JOIN JOBS J ON(E.JOB_ID = J.JOB_ID)
+JOIN DEPARTMENTS D ON (E.DEPARTMENT_ID = D.DEPARTMENT_ID);
 
 -- 2. Să se afişeze numele salariatului şi numele departamentului pentru toţi salariaţii care au litera A inclusă în nume.
-
+SELECT
+    E.FIRST_NAME, D.DEPARTMENT_NAME
+FROM EMPLOYEES E
+JOIN DEPARTMENTS D ON(E.DEPARTMENT_ID = D.DEPARTMENT_ID)
+WHERE UPPER(E.FIRST_NAME) LIKE '%A%';
 
 -- 3. Să se afişezenumele, job-ul, codul şi numele departamentului pentru toţi angajaţii care lucrează în Oxford.
 
