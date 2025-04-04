@@ -23,5 +23,28 @@ WHERE UPPER(E.FIRST_NAME) LIKE '%A%';
 -- 7. Să se afişeze numele şi data angajării pentru salariaţii care au fost angajaţi după Gates.
 
 -- 8. Sa se afișeze codul şi numele angajaţilor care lucrează în același departament cu cel puţin un alt angajat al cărui nume conţine litera “t”. Se vor afişa, de asemenea, codul şi numele departamentului respectiv. Rezultatul va fi ordonat alfabetic după nume.
+SELECT DISTINCT *
+FROM EMPLOYEES;
+-- DISTINCT PENTRU A FI FARA DUPLICATE
 
 -- 9. Sa se afișeze numele, salariul, titlul job-ului, oraşul şi ţara în care lucrează angajatii condusi direct de King.
+SELECT 
+    E.FIRST_NAME
+FROM EMPLOYEES E
+JOIN EMPLOYEES B ON (E.EMPLOYEE_ID = B.E.EMPLOYEE_ID);
+
+-- Operatori pe multimi
+-- La union se face un fel de reuniune a multimilor
+
+-- 1. Se cer codurile departamentelor al căror nume conţine şirul “re” sau în care lucrează angajaţi având codul job-ului “SA_REP”.
+SELECT D.DEPARTMENT_ID
+FROM DEPARTMENTS D
+WHERE UPPER(D.DEPARTMENT_NAME) LIKE '%RE%';
+-- NOTA: Asta l-am facut initial cu OR insa trebe cu UNION ca la catedra
+
+-- 2. Sa se obtina codurile departamentelor in care nu lucreaza nimeni (nu este introdus nici un salariat in tabelul employees). Se cer două soluţii.
+SELECT department_id
+FROM departments
+WHERE department_id NOT IN (SELECT department_id
+FROM employees);
+-- ? Este corecta aceasta varianta? De ce ?
