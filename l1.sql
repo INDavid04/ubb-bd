@@ -67,7 +67,7 @@ SELECT
     SALARY * 12 "SALARIU ANUAL"
 FROM EMPLOYEES
 WHERE (SALARY >= 1500) AND
-        (DEPARTMENT_ID IN (10, 30))
+        (DEPARTMENT_ID IN (10, 30));
 
 -- 14. Care este data curentă? Afişaţi diferite formate ale acesteia. Obs: Functia care returnează data curentă este SYSDATE. Pentru completarea sintaxei obligatorii a comenzii SELECT, se utilizează tabelul DUAL: Datele calendaristice pot fi formatate cu ajutorul funcţiei TO_CHAR(data, format), unde formatul poate fi alcătuit dintr-o combinaţie a următoarelor elemente:
 -- Element - Semnificaţie:
