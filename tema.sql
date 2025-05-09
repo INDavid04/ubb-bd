@@ -6,29 +6,59 @@
     -- TURNEE (id_turneu, id_artist, nume_turneu, data_start, data_incheiere)
     -- CONCERTE (id_concert, id_turneu, id_artist_deschidere, oras, tara, data, venit)
 
--- TODO 1.1 Sa se afiseze pentru fiecare artist numele si cate formatii a avut in deschidere (ATENTIE: daca o formatie a cantat de mai multe ori in deschiderea unui artist, atunci se va contoriza o singura data) (0.1p)
+-- 1.1 Sa se afiseze pentru fiecare artist numele si cate formatii a avut in deschidere (ATENTIE: daca o formatie a cantat de mai multe ori in deschiderea unui artist, atunci se va contoriza o singura data) (0.1p)
 SELECT A.NUME, COUNT(DISTINCT C.ID_ARTIST_DESCHIDERE) AS "NUMAR FORMATII"
 FROM ARTISTI A
-JOIN CONCERTE C ON A.ID_ARTIST = C.ID_ARTIST_DESCHIDERE
+JOIN TURNEE T ON T.ID_ARTIST = A.ID_ARTIST
+JOIN CONCERTE C ON C.ID_TURNEU = T.ID_TURNEU
 GROUP BY A.NUME;
 
 -- TODO 1.2 Sa se afiseze pentru fiecare artist numele si numarul de albume lansate inainte de data ultimului premiu castigat. Se vor lua in considerare doar acei artisti care au sustinut cel putin 3 concerte in anul 2024. (0.1p)
+-- Understanding:
+
 SELECT 
     AR.NUME, 
     COUNT(AL.ID_ALBUM) AS "NUMAR ALBUME"
 FROM ARTISTI AR
 JOIN ALBUME AL ON AR.ID_ARTIST = AL.ID_ARTIST
+JOIN (
+    SELECT ID_ARTIST, MAX(AN_DECERNARE) AS ULTIMUL_PREMIU
+    FROM PREMII_CASTIGATE
+    GROUP BY ID_ARTIST
+) P ON P.ID_ARTIST = AR.ID_ARTIST
+WHERE 
+    AL.AN_LANSARE < P.ULTIMUL_PREMIU 
+    AND AR.ID_ARTIST IN (
+        SELECT T.ID_ARTIST
+        FROM CONCERTE C
+        JOIN TURNEE T ON C.ID_TURNEU = T.ID_TURNEU
+        WHERE EXTRACT(YEAR FROM C.DATA) = 2024
+        GROUP BY T.ID_ARTIST
+        HAVING COUNT(*) >= 3
+    )
+GROUP BY AR.NUME;
+
+-- 1.3 Sa se afiseze pentru fiecare artist venitul obtinut in anul 2025 la concerte unde au avut in deschidere un artist care a castigat cel putin 3 premii. (0.1p)
+SELECT 
+    SUM(C.VENIT) AS "VENIT TOTAL"
+FROM CONCERTE C
+JOIN TURNEE T ON C.ID_TURNEU = T.ID_TURNEU
+WHERE 
+    EXTRACT(YEAR FROM C.DATA) = 2025
+    AND C.ID_ARTIST_DESCHIDERE IN (
+        SELECT P.ID_ARTIST
+        FROM PREMII_CASTIGATE P
+        GROUP BY P.ID_ARTIST
+        HAVING COUNT(P.ID_PREMIU) > 2
+    )
+GROUP BY T.ID_ARTIST;
+
+-- Aside: Afiseaza artistii care au castigat cel putin trei premii!
+SELECT AR.NUME
+FROM ARTISTI AR
 JOIN PREMII_CASTIGATE P ON P.ID_ARTIST = AR.ID_ARTIST
 GROUP BY AR.NUME
-WHERE AL.AN_LANSARE < P.AN_DECERNARE AND COUNT(C.DATA) > 3;
-
--- TODO 1.3 Sa se afiseze pentru fiecare artist venitul obtinut in anul 2025 la concerte unde au avut in deschidere un artist care a castigat cel putin 3 premii. (0.1p)
-SELECT C.VENIT, C.ID_CONCERT
-FROM CONCERTE C
-JOIN ARTISTI AR ON AR.ID_ARTIST = C.ID_ARTIST_DESCHIDERE
-JOIN PREMII_CASTIGATE PC ON PC.ID_ARTIST = AR.ID_ARTIST
-WHERE DATA LIKE '%/25' AND COUNT(PC.ID_ARTIST) > 2
-GROUP BY AR.ID_ARTIST;
+HAVING COUNT(P.ID_PREMIU) > 2;
 
 -- Tema 2: Informatii utile (continutul diagramei)
     -- CLIENTI (id_client, nume, email, data_inregistrare)
@@ -45,15 +75,23 @@ JOIN REZERVARI R ON P.ID_PROPRIETATE = R.ID_PROPRIETATE
 WHERE UPPER(R.STATUS) = 'CONFIRMATA'
 GROUP BY P.ORAS;
 
--- TODO 2.2 Sa se afiseze clientii (id si nume) care au efectuat exclusiv plati cash si au cel putin 3 review-uri cu rating mai mare sau egal cu 2. (0.1p)
+-- 2.2 Sa se afiseze clientii (id si nume) care au efectuat exclusiv plati cash si au cel putin 3 review-uri cu rating mai mare sau egal cu 2. (0.1p)
 SELECT C.ID_CLIENT, C.NUME
 FROM CLIENTI C
-JOIN REZERVARI R ON R.ID_CLIENT = C.ID_CLIENT
-JOIN PLATI P ON P.ID_REZERVARE = R.ID_REZERVARE
-JOIN REVIEWS W ON W.ID_CLIENT = C.ID_CLIENT
-WHERE UPPER(P.METODA) = 'CASH' AND W.RATING > 1;
+WHERE 
+    NOT EXISTS (
+        SELECT 1 
+        FROM REZERVARI R 
+        JOIN PLATI P ON P.ID_REZERVARE = R.ID_REZERVARE
+        WHERE R.ID_CLIENT = C.ID_CLIENT AND UPPER(P.METODA) <> 'CASH'
+    )
+    AND (
+        SELECT COUNT(*) 
+        FROM REVIEWS W 
+        WHERE W.ID_CLIENT = C.ID_CLIENT AND W.RATING > 1
+    ) > 2;
 
--- TODO 2.3 Sa se afize primii N clienti (id si nume) in functie de totalul cheltuielilor pe rezervari, unde N reprezinta numarul de proprietati care au fost rezervate in 2025 (indiferent daca rezervarea a fost confirmata sau anulata.) (0.1p)
+-- 2.3 Sa se afize primii N clienti (id si nume) in functie de totalul cheltuielilor pe rezervari, unde N reprezinta numarul de proprietati care au fost rezervate in 2025 (indiferent daca rezervarea a fost confirmata sau anulata.) (0.1p)
 SELECT C.ID_CLIENT, C.NUME, SUM(PRET.PRET_PER_NOAPTE) AS CHELTUIELI
 FROM CLIENTI C
 JOIN REZERVARI R ON R.ID_CLIENT = C.ID_CLIENT
