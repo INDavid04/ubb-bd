@@ -1,3 +1,7 @@
+--------------
+-- La clasa --
+--------------
+
 --EXEMPLU FUNCTIE SINGLE-ROW
 SELECT
     LENGTH(FIRST_NAME)
@@ -254,7 +258,11 @@ FROM DUAL;
 SELECT DECODE(1, 2, 1, 3, 1)
 FROM DUAL;
 
---1
+-----------------------------------------------
+-- Exercitii: Functii pe siruri de caractere --
+-----------------------------------------------
+
+-- 1. Scrieţi o cerere care are următorul rezultat pentru fiecare angajat: <prenume angajat> <nume angajat> castiga <salariu> lunar dar doreste <salariu de 3 ori mai mare>. Etichetati coloana “Salariu ideal”. Pentru concatenare, utilizaţi atât funcţia CONCAT cât şi operatorul “||”.
 --<NUME ANGAJAT> CASTIGA <SALARIU>
 SELECT
     CONCAT(FIRST_NAME, CONCAT(' CASTIGA ', SALARY))
@@ -264,7 +272,7 @@ SELECT
     FIRST_NAME || ' CASTIGA ' || SALARY
 FROM EMPLOYEES;
 
---2
+-- 2. Scrieţi o cerere prin care să se afişeze prenumele salariatului cu prima litera majusculă şi toate celelalte litere minuscule, numele acestuia cu majuscule şi lungimea numelui, pentru angajaţii al căror nume începe cu J sau M sau care au a treia literă din nume A. Rezultatul va fi ordonat descrescător după lungimea numelui. Se vor eticheta coloanele corespunzător. Se cer 2 soluţii (cu operatorul LIKE şi funcţia SUBSTR).
 SELECT
     INITCAP(FIRST_NAME),
     UPPER(LAST_NAME),
@@ -286,14 +294,14 @@ WHERE
     OR SUBSTR(UPPER(LAST_NAME), 3, 1) = 'A'
 ORDER BY LG DESC;
 
---3
+-- 3. Să se afişeze pentru angajaţii cu prenumele „Steven”, codul, numele şi codul departamentului în care lucrează. Căutarea trebuie să nu fie case-sensitive, iar eventualele blank-uri care preced sau urmează numelui trebuie ignorate.
 ----LAST_NAME = '   STEvEn   '
 SELECT
     EMPLOYEE_ID, FIRST_NAME, DEPARTMENT_ID
 FROM EMPLOYEES
 WHERE UPPER(TRIM(FIRST_NAME)) = 'STEVEN';
 
---4
+-- 4. Să se afişeze pentru toţi angajaţii al căror nume se termină cu litera 'e', codul, numele, lungimea numelui şi poziţia din nume în care apare prima data litera 'a'. Utilizaţi alias-uri corespunzătoare pentru coloane.
 SELECT
     EMPLOYEE_ID, FIRST_NAME,
     LENGTH(FIRST_NAME),
@@ -301,7 +309,11 @@ SELECT
 FROM EMPLOYEES
 WHERE SUBSTR(UPPER(FIRST_NAME), -1) = 'E';
 
---5
+-----------------------------------
+-- Exercitii: Functii aritmetice --
+-----------------------------------
+
+-- 5. Să se afişeze detalii despre salariaţii care au lucrat un număr întreg de săptămâni până la data curentă. Este necesară rotunjirea diferentei celor două date calendaristice?
 SELECT
     *
 FROM EMPLOYEES
@@ -317,7 +329,7 @@ SELECT
 FROM EMPLOYEES
 WHERE TO_CHAR(SYSDATE, 'D') = TO_CHAR(HIRE_DATE, 'D');
 
---6
+-- 6. Să se afişeze codul salariatului, numele, salariul, salariul mărit cu 15%, exprimat cu două zecimale şi numărul de sute al salariului nou rotunjit la 2 zecimale. Etichetaţi ultimele două coloane “Salariu nou”, respectiv “Numar sute”. Se vor lua în considerare salariaţii al căror salariu nu este divizibil cu 1000.
 SELECT
     EMPLOYEE_ID, FIRST_NAME, SALARY,
     TO_CHAR(SALARY + SALARY * 15/100,'999999.99') "SALARIU NOU",
@@ -325,7 +337,7 @@ SELECT
 FROM EMPLOYEES
 WHERE MOD(SALARY, 1000) <> 0;
 
---7
+-- 7. Să se listeze numele, salariul şi o coloana care sa reprezinte nivelul venitului (pentru fiecare 1000 sa fie folosit cate un simbol $). Ex: 6750 -> ‘$$$$$$’
 SELECT EMPLOYEE_ID, SALARY,
        TRIM(LPAD(' ', TRUNC(SALARY/1000) + 1,'$'))
 FROM EMPLOYEES;
@@ -334,17 +346,21 @@ SELECT EMPLOYEE_ID, SALARY,
        LPAD('$', TRUNC(SALARY/1000),'$')
 FROM EMPLOYEES;
 
---8
+-----------------------------------------------------------
+-- Exercitii: Functii si operatii cu date calendaristice --
+-----------------------------------------------------------
+
+-- 8. Să se afişeze data (numele lunii, ziua, anul, ora, minutul si secunda) de peste 30 zile.
 SELECT
     TO_CHAR(SYSDATE + 30, 'DD-MON-YYYY HH24:MI:SS')
 FROM DUAL;
 
---9
+-- 9. Să se afişeze numărul de zile rămase până la sfârşitul anului.
 SELECT
     SYSDATE - TO_DATE('01-01-' || TO_CHAR(SYSDATE, 'YYYY'),'DD-MM-YYYY')
 FROM DUAL;
 
---10
+-- 10. (a) Să se afişeze data de peste 12 ore. (b) Să se afişeze data de peste 5 minute
 SELECT
     SYSDATE + 1/2
 FROM DUAL;
@@ -357,28 +373,28 @@ SELECT
     SYSDATE + INTERVAL '5' MINUTE
 FROM DUAL;
 
---11
+-- 11. Să se afişeze numele şi prenumele angajatului (într-o singură coloană), data angajării şi data negocierii salariului, care este prima zi de Luni după 6 luni de serviciu. Etichetaţi această coloană “Negociere”.
 SELECT
     FIRST_NAME || ' ' || LAST_NAME,
     HIRE_DATE,
     NEXT_DAY(ADD_MONTHS(HIRE_DATE, 6), 'MONDAY') "NEGOCIERE"
 FROM EMPLOYEES;
 
---12
+-- 12. Pentru fiecare angajat să se afişeze numele şi numărul de luni de la data angajării. Etichetaţi coloana “Luni lucrate”. Să se ordoneze rezultatul după numărul de luni lucrate. Se va rotunji numărul de luni la cel mai apropiat număr întreg.
 SELECT
     FIRST_NAME,
     MONTHS_BETWEEN(SYSDATE, HIRE_DATE) AS "NUMAR LUNI"
 FROM EMPLOYEES
 ORDER BY "NUMAR LUNI"; --ALISU-UL POATE FI FOLOSIT PENTRU A ACCESA VALOAREA DE PE COLOANA RESPECTIVA DOAR IN CLAUZA "ORDER BY"
 
---13
+-- 13. Să se afişeze numele, data angajării şi ziua săptămânii în care a început lucrul fiecare salariat. Etichetaţi coloana “Zi”. Ordonaţi rezultatul după ziua săptămânii, începând cu Luni. 
 SELECT
     FIRST_NAME, HIRE_DATE,
     TO_CHAR(HIRE_DATE, 'DAY') AS ZI
 FROM EMPLOYEES
 ORDER BY TO_CHAR(HIRE_DATE, 'D');
 
---14
+-- 14. Sa se afiseze numele şi data angajării pentru fiecare salariat care a fost angajat in 1987. Se cer 2 soluţii: una în care se lucrează cu formatul implicit al datei şi alta prin care se formatează data. Obs: Elementele (câmpuri ale valorilor de tip datetime) care pot fi utilizate în cadrul acestei funcției EXTRACT sunt: YEAR, MONTH, DAY, HOUR, MINUTE, SECOND.
 SELECT FIRST_NAME, HIRE_DATE
 FROM EMPLOYEES
 WHERE EXTRACT(YEAR FROM HIRE_DATE) = 1987;
@@ -396,7 +412,11 @@ SELECT FIRST_NAME, HIRE_DATE
 FROM EMPLOYEES
 WHERE HIRE_DATE LIKE '%87%';
 
---15
+--------------------------------
+-- Exercitii: Functii diverse --
+--------------------------------
+
+-- 15. Să se afişeze numele angajaţilor şi comisionul. Dacă un angajat nu câştigă comision, să se scrie “Fara comision”. Etichetaţi coloana “Comision”.
 SELECT
     LAST_NAME, COMMISSION_PCT,
     NVL(TO_CHAR(COMMISSION_PCT, '0.999'), 'FARA COMISION')
@@ -410,7 +430,7 @@ SELECT
     END
 FROM EMPLOYEES;
 
---16
+-- 16. Să se listeze numele, salariul şi comisionul tuturor angajaţilor al căror venit lunar (salariu + valoare comision) depăşeşte 10000.
 SELECT
     FIRST_NAME, SALARY, COMMISSION_PCT
 FROM EMPLOYEES
@@ -421,7 +441,7 @@ SELECT
 FROM EMPLOYEES
 WHERE SALARY + COMMISSION_PCT * SALARY > 10000 OR SALARY > 10000;
 
---17
+-- 17. Să se afişeze numele, codul job-ului, salariul şi o coloană care să arate salariul după mărire. Se presupune că pentru IT_PROG are loc o mărire de 20%, pentru SA_REP creşterea este de 25%, iar pentru SA_MAN are loc o mărire de 35%. Pentru ceilalti angajati nu se acorda marire.
 SELECT
     FIRST_NAME,
     JOB_ID,

@@ -1,3 +1,7 @@
+--------------
+-- La clasa --
+--------------
+
 --OPERATIE DE JOIN FOLOSIND CLAUZA WHERE
 SELECT
     E.EMPLOYEE_ID, D.DEPARTMENT_NAME
@@ -59,21 +63,25 @@ SELECT *
 FROM EMPLOYEES
 NATURAL JOIN DEPARTMENTS;
 
---1
+---------------
+-- Exercitii --
+---------------
+
+-- 1. Să se listeze job-urile angajaților care lucrează în departamentul 30.
 SELECT
     E.EMPLOYEE_ID, J.JOB_TITLE
 FROM EMPLOYEES E
 LEFT JOIN JOBS J ON E.JOB_ID = J.JOB_ID
 WHERE E.DEPARTMENT_ID = 30;
 
---2
+-- 2. Săse afişeze numele salariatului şi numele departamentului pentru toţi salariaţii care au litera A inclusă în nume.
 SELECT
     E.FIRST_NAME, D.DEPARTMENT_NAME
 FROM EMPLOYEES E
 LEFT JOIN DEPARTMENTS D ON E.DEPARTMENT_ID = D.DEPARTMENT_ID
 WHERE UPPER(E.FIRST_NAME) LIKE '%A%';
 
---3
+-- 3. Să se afişezenumele, job-ul, codul şi numele departamentului pentru toţi angajaţii care lucrează în Oxford.
 SELECT
     E.EMPLOYEE_ID, E.JOB_ID, D.DEPARTMENT_NAME
 FROM EMPLOYEES E
@@ -81,14 +89,14 @@ JOIN DEPARTMENTS D ON E.DEPARTMENT_ID = D.DEPARTMENT_ID
 JOIN LOCATIONS L ON D.LOCATION_ID = L.LOCATION_ID
 WHERE UPPER(L.CITY) = 'OXFORD';
 
---4
+-- 4. Sa se determine codurile angajatilor si numele job-urilor al caror salariu este mai mare decat 3000 sau este egal cu media dintre salariul minim si salariul maxim aferente job-ului respectiv.
 SELECT
     E.EMPLOYEE_ID, J.JOB_TITLE
 FROM EMPLOYEES E
 JOIN JOBS J ON E.JOB_ID = J.JOB_ID
 WHERE SALARY > 3000 OR E.SALARY = (J.MAX_SALARY + J.MIN_SALARY)/2;
 
---5
+-- 5. Sa se afișeze codul departamentului, numele departamentului, numele și job-ul tuturor angajaților din departamentele al căror nume conţine şirul ‘ti’. Rezultatul se va ordona alfabetic după numele departamentului, şi în cadrul acestuia, după numele angajaţilor.
 SELECT
     D.DEPARTMENT_ID, D.DEPARTMENT_NAME, E.FIRST_NAME, E.JOB_ID
 FROM EMPLOYEES E
@@ -96,7 +104,7 @@ JOIN DEPARTMENTS D on E.DEPARTMENT_ID = D.DEPARTMENT_ID
 WHERE UPPER(D.DEPARTMENT_NAME) LIKE '%TI%'
 ORDER BY D.DEPARTMENT_NAME, E.FIRST_NAME;
 
---6
+-- 6. Să se afişeze codulangajatului şi numele acestuia, împreună cu numele şi codul şefului său direct. Se vor eticheta coloanele Ang#, Angajat, Mgr#, Manager.
 --EXEMPLU SELF JOIN
 SELECT
     E.EMPLOYEE_ID "ID ANGAJAT", E.FIRST_NAME "ANGAJAT",
@@ -104,14 +112,14 @@ SELECT
 FROM EMPLOYEES E
 LEFT JOIN EMPLOYEES E2 ON E.MANAGER_ID = E2.EMPLOYEE_ID;
 
---7
+-- 7. Să se afişeze numele şi data angajării pentru salariaţii care au fost angajaţi după Gates.
 SELECT
     E.EMPLOYEE_ID, E.HIRE_DATE, E2.HIRE_DATE
 FROM EMPLOYEES E
 JOIN EMPLOYEES E2 ON
     UPPER(E2.LAST_NAME) = 'GATES' AND E.HIRE_DATE > E2.HIRE_DATE;
 
---8
+-- 8. Sa se afișeze codul şi numele angajaţilor care lucrează în același departament cu cel puţin un alt angajat al cărui nume conţine litera “t”. Se vor afişa, de asemenea, codul şi numele departamentului respectiv. Rezultatul va fi ordonat alfabetic după nume.
 SELECT
     DISTINCT E.EMPLOYEE_ID, E.FIRST_NAME
 FROM EMPLOYEES E
@@ -122,7 +130,7 @@ JOIN EMPLOYEES E2 ON
 JOIN DEPARTMENTS D ON E.DEPARTMENT_ID = D.DEPARTMENT_ID
 ORDER BY E.FIRST_NAME;
 
---9
+-- 9. Sa se afișeze numele, salariul, titlul job-ului, oraşul şi ţara în care lucrează angajatii condusi direct de King.
 SELECT
     E.EMPLOYEE_ID, E.SALARY, J.JOB_TITLE, L.CITY, C.COUNTRY_NAME
 FROM EMPLOYEES E
@@ -133,12 +141,14 @@ JOIN LOCATIONS L ON D.LOCATION_ID = L.LOCATION_ID
 JOIN COUNTRIES C ON L.COUNTRY_ID = C.COUNTRY_ID
 WHERE UPPER(E2.LAST_NAME) = 'KING';
 
---OPERATORI PE MULTIMI
-    --REGULI DE RESPECTAT CAND SE UTILIZEAZA OPERATORI PE MULTIMI
-        --1: IN CELE 2 CERERI, IN CLAUZA SELECT TREBUIE SA FIE ACELASI NUMAR DE CAMPURI
-        --2: CAMPURILE DIN CLAUZA SELECT TREBUIE SA CORESPUNDA CA SI TIP DE DATE
+--------------------------
+-- OPERATORI PE MULTIMI --
+--------------------------
+--REGULI DE RESPECTAT CAND SE UTILIZEAZA OPERATORI PE MULTIMI
+-- 1: IN CELE 2 CERERI, IN CLAUZA SELECT TREBUIE SA FIE ACELASI NUMAR DE CAMPURI
+-- 2: CAMPURILE DIN CLAUZA SELECT TREBUIE SA CORESPUNDA CA SI TIP DE DATE
 
- --1
+-- 1. Se cer codurile departamentelor al căror nume conţine şirul “re” sau în care lucrează angajaţi având codul job-ului “SA_REP”.
 SELECT
     D.DEPARTMENT_ID AS DEP
 FROM DEPARTMENTS D
@@ -149,7 +159,7 @@ SELECT
 FROM EMPLOYEES E
 WHERE UPPER(E.JOB_ID) = 'SA_REP';
 
---2
+-- 2. Sa se obtina codurile departamentelor in care nu lucreaza nimeni (nu este introdus nici un salariat in tabelul employees). Se cer două soluţii. SELECT department_id FROM departments WHERE department_id NOT IN (SELECT department_id FROM employees); ? Este corecta aceasta varianta? De ce ?
 SELECT
     DEPARTMENT_ID
 FROM DEPARTMENTS

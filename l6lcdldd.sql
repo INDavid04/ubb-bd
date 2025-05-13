@@ -1,3 +1,7 @@
+--------------
+-- La clasa --
+--------------
+
 -------------------------LCD
 -- COMMIT -> PERMANENTIZEAZA MODIFICARILE
 -- ROLLBACK -> ANULEAZA MODIFICARILE PANA LA ULTIMUL COMMIT EXECUTAT
