@@ -94,9 +94,9 @@ HAVING COUNT(a.lista_id) > N;
 ### 6. Alte observații
 #### Iulia Teodora Banu Demergian
 - N/A
-### Nedelcu Alexandru-Constantin
+#### Nedelcu Alexandru-Constantin
 - Tema proiectului este creativă și aplicabilitatea reală este bine evidențiată. Descrierea prezintă foarte bine contextul, relațiile dintre entități și constrângerile.
 - Diagramele sunt desenate clar, iar organizarea entităților face citirea și urmărirea relațiilor ușoară.
 - Consider că este necesar să mai fie adăugate câteva entități pentru a face proiectul mai complex. În plus, ar putea fi adăugate primary si foreign key-urile pentru toate entitățile pentru a evita confuzii asupra tipului unei entități.
-### Miu Georgian-Fabian
+#### Miu Georgian-Fabian
 - Tema este foarte originală, interesantă, realistă și bine ancorată într-un context muzical autentic. Felicitări pentru creativitate!
