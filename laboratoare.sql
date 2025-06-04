@@ -321,114 +321,84 @@ WHERE D.MANAGER_ID IS NULL;
 ---------------------------
 
 -- 1. Folosind subcereri, scrieţi o cerere pentru a afişa numele şi salariul pentru toţi colegii (din acelaşi departament) lui Gates. Se va exclude Gates
-
-
-SELECT
-    E.FIRST_NAME, E.SALARY
-FROM EMPLOYEES E
-WHERE E.DEPARTMENT_ID = (
-        SELECT
-            E2.DEPARTMENT_ID
-        FROM EMPLOYEES E2
-        WHERE UPPER(E2.FIRST_NAME) = 'GATES' OR UPPER(E2.LAST_NAME) = 'GATES' AND E2.EMPLOYEE_ID <> E.EMPLOYEE_ID
-    );
+SELECT E1.FIRST_NAME, E1.SALARY
+FROM EMPLOYEES E1
+WHERE E1.DEPARTMENT_ID = (
+    SELECT E2.DEPARTMENT_ID
+    FROM EMPLOYEES E2
+    WHERE UPPER(E2.FIRST_NAME) = 'GATES' OR UPPER(E2.LAST_NAME) = 'GATES' AND E2.EMPLOYEE_ID != E1.EMPLOYEE_ID
+);
 
 -- 2. Afișați pentru fiecare angajat codul, numele, salariul, precum și numele șefului direct.
-
-
-SELECT
-    E.EMPLOYEE_ID, E.FIRST_NAME,
-       (
-           SELECT
-                E2.FIRST_NAME
-           FROM EMPLOYEES E2
-           WHERE E2.EMPLOYEE_ID = E.MANAGER_ID
-       )
-FROM EMPLOYEES E;
+SELECT E1.EMPLOYEE_ID, E1.FIRST_NAME || ' ' || E1.LAST_NAME AS "NUME ANGAJAT", E1.SALARY, (
+    SELECT E2.FIRST_NAME || ' ' || E2.LAST_NAME
+    FROM EMPLOYEES E2
+    WHERE E2.EMPLOYEE_ID = E1.MANAGER_ID
+) AS "NUME SEF DIRECT"
+FROM EMPLOYEES E1;
 
 -- 3. Scrieți o cerere pentru a afișa angajații care castiga mai mult decat oricare funcționar (job-ul conţine şirul “CLERK”). Sortati rezultatele după salariu, in ordine descrescatoare (se vor exclude pe ei înșiși).
-
-
-SELECT
-    E.FIRST_NAME, E.SALARY
-FROM EMPLOYEES E
-WHERE E.SALARY >= ALL (
-        SELECT
-            E2.SALARY
-        FROM EMPLOYEES E2
-        WHERE UPPER(E2.JOB_ID) LIKE '%CLERK%' AND E2.EMPLOYEE_ID <> E.EMPLOYEE_ID
-    );
+SELECT E1.FIRST_NAME || ' ' || E1.LAST_NAME AS "NUME ANGAJAT", E1.SALARY
+FROM EMPLOYEES E1
+WHERE E1.SALARY >= ALL (
+    SELECT E2.SALARY
+    FROM EMPLOYEES E2
+    WHERE UPPER(E2.JOB_ID) LIKE '%CLERK%' AND E2.EMPLOYEE_ID != E1.EMPLOYEE_ID
+)
+ORDER BY E1.SALARY DESC;
 
 -- 4. Scrieţi o cerere pentru a afişa numele, numele departamentului şi salariul angajaţilor care nu câştigă comision, dar al căror şef direct câştigă comision.
-
-
-SELECT E.EMPLOYEE_ID
-FROM EMPLOYEES E
-WHERE E.COMMISSION_PCT IS NULL AND (
-        SELECT
-            E2.COMMISSION_PCT
-        FROM EMPLOYEES E2
-        WHERE E2.EMPLOYEE_ID = E.MANAGER_ID
-    ) IS NOT NULL;
+SELECT E1.FIRST_NAME || ' ' || E1.LAST_NAME AS "NUME ANGAJAT", D.DEPARTMENT_NAME AS "NUME DEPARTAMENT", E1.SALARY AS "SALARIU ANGAJAT"
+FROM EMPLOYEES E1
+JOIN DEPARTMENTS D ON D.DEPARTMENT_ID = E1.EMPLOYEE_ID
+WHERE E1.COMMISSION_PCT IS NULL AND (
+    SELECT E2.COMMISSION_PCT
+    FROM EMPLOYEES E2
+    WHERE E2.EMPLOYEE_ID = E1.MANAGER_ID
+) IS NOT NULL;
 
 -- 5. Pentru fiecare departament, să se obțina numele salariatului avand cea mai mare vechime din departament. Să se ordoneze rezultatul după numele departamentului.
-
-
-SELECT
-    E.FIRST_NAME, E.DEPARTMENT_ID, D.DEPARTMENT_NAME
-FROM EMPLOYEES E
-JOIN DEPARTMENTS D ON E.DEPARTMENT_ID = D.DEPARTMENT_ID
-WHERE SYSDATE - E.HIRE_DATE >= ALL(
-        SELECT
-            SYSDATE - E2.HIRE_DATE
-        FROM EMPLOYEES E2
-        WHERE E.DEPARTMENT_ID = E2.DEPARTMENT_ID
-    )
+SELECT E1.FIRST_NAME || ' ' || E1.LAST_NAME AS "NUME ANGAJAT", D.DEPARTMENT_NAME AS "DEPARTAMENT ANGAJAT"
+FROM EMPLOYEES E1
+JOIN DEPARTMENTS D ON D.DEPARTMENT_ID = E1.DEPARTMENT_ID
+WHERE SYSDATE - E1.HIRE_DATE >= ALL (
+    SELECT SYSDATE - E2.HIRE_DATE
+    FROM EMPLOYEES E2
+    WHERE E1.DEPARTMENT_ID = E2.DEPARTMENT_ID AND E1.EMPLOYEE_ID != E2.EMPLOYEE_ID
+)
 ORDER BY D.DEPARTMENT_NAME;
 
 -- 6. Scrieți o cerere pentru a afişa numele, codul departamentului și salariul angajatilor al căror număr de departament și salariu coincid cu numărul departamentului și salariul unui angajat care castiga comision (se vor exclude pe ei înșiși).
-
-
-SELECT
-    E.FIRST_NAME, E.DEPARTMENT_ID, E.SALARY
-FROM EMPLOYEES E
-WHERE (E.DEPARTMENT_ID, E.SALARY) IN (
-        SELECT
-            E2.DEPARTMENT_ID, E2.SALARY
-        FROM EMPLOYEES E2
-        WHERE E2.COMMISSION_PCT IS NOT NULL AND
-                E.EMPLOYEE_ID <> E2.EMPLOYEE_ID
-    );
+SELECT E1.FIRST_NAME || ' ' || E1.LAST_NAME AS "NUME ANGAJAT", E1.DEPARTMENT_ID, E1.SALARY
+FROM EMPLOYEES E1
+WHERE E1.DEPARTMENT_ID IN (
+    SELECT E2.DEPARTMENT_ID
+    FROM EMPLOYEES E2
+    WHERE E2.COMMISSION_PCT IS NOT NULL AND E2.EMPLOYEE_ID != E1.EMPLOYEE_ID
+) AND E1.SALARY IN (
+    SELECT E2.SALARY
+    FROM EMPLOYEES E2
+    WHERE E2.COMMISSION_PCT IS NOT NULL AND E2.EMPLOYEE_ID != E1.EMPLOYEE_ID
+); -- SE PUTEA COMPACTA: `WHERE (E1.DEPARTMENT_ID, E1.SALARY) IN (SELECT E2.DEPARTMENT_ID, E2.SALARY FROM EMPLOYEES E2 WHERE E2.COMMISSION_PCT IS NOT NULL AND E2.EMPLOYEE_ID != E1.EMPLOYEE_ID)
 
 -- 7. Folosind subcereri, să se afişeze numele, salariul și numele colegului de departament cu cel mai mare salariu, al angajaţilor conduşi direct de preşedintele companiei (acesta este considerat angajatul care nu are manager).
+SELECT E1.FIRST_NAME || ' ' || E1.LAST_NAME AS "NUME ANGAJAT", E1.SALARY AS "SALARIU", (
+    SELECT E2.FIRST_NAME || ' ' || E2.LAST_NAME
+    FROM EMPLOYEES E2
+    WHERE E2.DEPARTMENT_ID = E1.DEPARTMENT_ID AND E2.SALARY > ALL (
+        SELECT E3.SALARY
+        FROM EMPLOYEES E3
+        WHERE E3.DEPARTMENT_ID = E2.DEPARTMENT_ID AND E3.EMPLOYEE_ID != E2.EMPLOYEE_ID
+    )
+) AS "NUME COLEG"
+FROM EMPLOYEES E1
+WHERE E1.MANAGER_ID = (
+    SELECT E2.EMPLOYEE_ID
+    FROM EMPLOYEES E2
+    WHERE E2.MANAGER_ID IS NULL
+);
 
-
-SELECT
-    E.FIRST_NAME, E.SALARY,
-       (
-           SELECT
-                E3.FIRST_NAME
-           FROM EMPLOYEES E3
-           WHERE E3.DEPARTMENT_ID = E.DEPARTMENT_ID AND
-                 E3.SALARY >ALL (
-                        SELECT E4.SALARY
-                        FROM EMPLOYEES E4
-                        WHERE E4.DEPARTMENT_ID = E3.DEPARTMENT_ID
-                            AND E4.EMPLOYEE_ID <> E3.EMPLOYEE_ID
-                   )
-           )
-FROM EMPLOYEES E
-WHERE E.MANAGER_ID = (
-        SELECT
-            E2.EMPLOYEE_ID
-        FROM EMPLOYEES E2
-        WHERE E2.MANAGER_ID IS NULL
-    );
-
---------------------------------------
---ROWNUM
---ROWNUM SE FOLOSESTE IN GENERAL PENTRU A AFISA TOP N PE BAZA UNEI SORTARI, MOTIV PENTRU CARE TREBUIE SA AVEM GRIJA CA
-    --MAI INTAI SE REALIZEAZA SORTAREA DATELOR SI APOI FILTRAREA PRIMELOR N
+-- ROWNUM SE FOLOSESTE IN GENERAL PENTRU A AFISA TOP N PE BAZA UNEI SORTARI, MOTIV PENTRU CARE TREBUIE SA AVEM GRIJA CA MAI INTAI SE REALIZEAZA SORTAREA DATELOR SI APOI FILTRAREA PRIMELOR N
 
 SELECT
     EMPLOYEE_ID, SALARY, ROWNUM
@@ -442,77 +412,48 @@ FROM (SELECT EMPLOYEE_ID, SALARY FROM EMPLOYEES ORDER BY SALARY DESC)
 WHERE ROWNUM <= 5; --IN ACEST CAZ, MAI INTAI SE FACE SORTAREA DATELOR SI APOI FILTRAREA
 
 -- 8. Sa se obtina numele primilor 7 angajați avand salariul maxim. Rezultatul se va afişa în ordine crescătoare a salariilor.
-
-
-SELECT
-    T.FIRST_NAME, T.SALARY
+SELECT E.FIRST_NAME || ' ' || E.LAST_NAME AS "NUME", E.SALARY AS "SALARIU", ROWNUM
 FROM (
-        SELECT *
-        FROM EMPLOYEES
-        ORDER BY SALARY DESC
-    ) T
+    SELECT *
+    FROM EMPLOYEES
+    ORDER BY SALARY DESC
+) E
 WHERE ROWNUM <= 7;
 
 -- 9. Sa se obtina numele angajatilor care castiga unul dintre cele mai mari 7 salarii. Rezultatul se va afişa în ordine crescătoare a salariilor.
-
-
-SELECT *
-FROM EMPLOYEES E
-WHERE E.SALARY IN (
-    SELECT
-        T.SALARY
+SELECT E1.FIRST_NAME || ' ' || E1.LAST_NAME AS "NUME", E1.SALARY "SALARIU"
+FROM EMPLOYEES E1
+WHERE E1.SALARY IN (
+    SELECT E2.SALARY
     FROM (
-            SELECT DISTINCT SALARY
-            FROM EMPLOYEES
-            ORDER BY SALARY DESC
-        ) T
+        SELECT DISTINCT SALARY
+        FROM EMPLOYEES
+        ORDER BY SALARY DESC
+    ) E2
     WHERE ROWNUM <= 7
-    );
+)
+ORDER BY E1.SALARY;
 
 -- 10. Afișați informații despre angajații care castiga cel de-al 7-lea salariu.
-
-
---METODA 1
 SELECT *
 FROM EMPLOYEES
 WHERE SALARY = (
-    SELECT
-        T.SALARY
+    SELECT T.SALARY
     FROM (
-            SELECT DISTINCT SALARY
-            FROM EMPLOYEES
-            ORDER BY SALARY ASC
-        ) T
+        SELECT DISTINCT SALARY
+        FROM EMPLOYEES
+        ORDER BY SALARY ASC
+    ) T
     WHERE ROWNUM <= 7
     MINUS
-    SELECT
-        T.SALARY
+    SELECT T.SALARY
     FROM (
-            SELECT DISTINCT SALARY
-            FROM EMPLOYEES
-            ORDER BY SALARY ASC
-        ) T
+        SELECT DISTINCT SALARY
+        FROM EMPLOYEES
+        ORDER BY SALARY ASC
+    ) T
     WHERE ROWNUM <= 6
 );
-
---METODA 2
-SELECT *
-FROM (
-    SELECT *
-    FROM EMPLOYEES E
-    WHERE E.SALARY IN (
-        SELECT
-            T.SALARY
-        FROM (
-                SELECT DISTINCT SALARY
-                FROM EMPLOYEES
-                ORDER BY SALARY ASC
-            ) T
-        WHERE ROWNUM <= 7
-        )
-    ORDER BY E.SALARY DESC
-     )
-WHERE ROWNUM = 1;
 
 --------------------------
 -- Laborator 5 Group By --
