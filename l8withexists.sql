@@ -81,7 +81,7 @@ with tabel_temp as (
 )
 select tabel_temp.sal
 from tabel_temp, tabel_temp2;
--- WITH e mai eficient din punt de vedere al timpului de utilizare fata de EXIST
+-- WITH e mai eficient din punt de vedere al timpului de utilizare fata de EXISTS
 
 -- Exist se screi in felul urmator si returneaza true sau false
 select *
@@ -93,7 +93,7 @@ where exists (
 
 -- Exercitii: 1. Sa se obtina numele salariatilor care lucreaza intr-un departament in care exista cel putin un angajat cu salariul egal cu salariul maxim din departamentul 30
 
--- La casa:
+-- La clasa:
 WITH TABEL_TEMP AS (
     SELECT MAX(SALARY) MAXIM
     FROM EMPLOYEES

@@ -531,5 +531,19 @@ JOIN JOBS J ON J.JOB_ID = E.JOB_ID
 GROUP BY D.DEPARTMENT_ID, D.DEPARTMENT_NAME, E.FIRST_NAME, E.LAST_NAME, E.SALARY, J.JOB_TITLE;
 
 -----------------------------
--- Laborator 8 With Exists --
+-- Laborator 8 Exists --
 -----------------------------
+
+-- Exercitii: 1. Sa se obtina numele salariatilor care lucreaza intr-un departament in care exista cel putin un angajat cu salariul egal cu salariul maxim din departamentul 30
+WITH "TABEL TEMPORAR" AS (
+    SELECT MAX(SALARY) AS "MAXIM"
+    FROM EMPLOYEES
+    WHERE DEPARTMENT_ID = 30
+)
+SELECT FIRST_NAME, LAST_NAME, DEPARTMENT_ID, SALARY
+FROM EMPLOYEES E1
+WHERE EXISTS (
+    SELECT *
+    FROM EMPLOYEES E2
+    WHERE E2.DEPARTMENT_ID = E1.DEPARTMENT_ID AND E2.SALARY = (SELECT "MAXIM" FROM "TABEL TEMPORAR")
+);
