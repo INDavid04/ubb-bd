@@ -1,13 +1,13 @@
---------------
--- CERINTE: --
---------------
+-------------
+-- CERINTE --
+-------------
 
 -- 10. Crearea unei secvențe ce va fi utilizată în inserarea înregistrărilor în tabele (punctul 11). 
 -- 11. Crearea tabelelor în SQL și inserarea de date coerente în fiecare dintre acestea (minimum 5 înregistrări în fiecare tabel neasociativ; minimum 10 înregistrări în tabelele asociative; maxim 30 de înregistrări în fiecare tabel). 
 
--------------
--- TABELE: --
--------------
+------------
+-- TABELE --
+------------
 
 -- UTILIZATOR (#id_utilizator, id_trupa, id_lista, id_cor, nume) 
 -- VOCALIST (#id_utilizator, rol) 
@@ -127,7 +127,7 @@ INSERT INTO COMPETITIE (ID_COMPETITIE, NUME, LOCATIE) VALUES (PROGRAM_SEQUENCE.N
 SELECT * FROM COMPETITIE;
 
 ----------------------------------------------
--- TABEL ASOCIATIV: TRUPA-PREMIU-COMPETITIE --
+-- TABEL ASOCIATIV: TRUPA_PREMIU_COMPETITIE --
 ----------------------------------------------
 
 DROP TABLE TRUPA_PREMIU_COMPETITIE;
