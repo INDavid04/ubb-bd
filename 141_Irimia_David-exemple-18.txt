@@ -1,0 +1,15 @@
+------------------------------------------------------------------------------------------------------------------------
+-- 18. Exemplificarea isolation levels prin exemple de tranzacții care se execută în paralel în condiții de concurență, evidențiind efectele diferitelor niveluri de izolare asupra concurenței și integrității datelor. 
+------------------------------------------------------------------------------------------------------------------------
+
+-- Prima tranzactie 
+-- SET TRANSACTION ISOLATION LEVEL READ COMMITTED; -- tranzactia poate vedea doar datele confirmate (committed)
+-- BEGIN;
+-- SELECT * FROM cantare WHERE id_cantare = 71; -- nu vede ce modifica a doua tranzactie daca aceasta nu face commit
+-- COMMIT;
+
+-- A doua tranzactie
+-- SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED; -- tranzactia poate vedea si datele neconfirmate (uncommitted)
+-- BEGIN:
+-- UPDATE cantare SET bpm = 150 WHERE id_cantare = 71; -- modifica bpm in 150 fara a da commit inca
+-- ROLLBACK; -- anuleaza modificarea, bpm revenind la valoarea initiala

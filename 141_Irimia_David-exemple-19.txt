@@ -1,0 +1,39 @@
+------------------------------------------------------------------------------------------------------------------------
+-- 19. Justificarea necesități/utilității migrării la o bază de date de tip NoSql. Identificarea scenariilor în care utilizarea unei baze de date NoSQL este mai avantajoasă decât a unei baze de date relaționale. 
+-- (a) Prezentarea structurii baze de date de tip NoSql. 
+-- (b) Prezentarea comenzilor pentru crearea bazei de date (spre exemplu a colecțiilor într-o bază de date de tip document) 
+-- (c) Prezentarea comenzilor pentru inserarea, modificarea și ștergerea documentelor sau înregistrărilor într-o bază de date NoSQL. 
+-- (d) Exemplificarea comenzilor pentru interogarea datelor, incluzând operațiuni de filtrare și sortare. 
+------------------------------------------------------------------------------------------------------------------------
+
+-- (a) Prezentarea structurii baze de date de tip NoSql
+-- Structura unei baze de date de tip NoSql este flexibila in sensul ca nu mai trebuie ca toate randurile dintr-un tabel sa aiba aceleasi coloane.
+-- ```JS
+-- {
+-- 	"_id": ObjectId,
+-- 	"nume": "DOMNUL MINUNILOR",
+-- 	"gama": "G#",
+-- 	"bpm": 120,
+-- 	"autori": ["Sunny Tranca", "Miriam Popescu"],
+-- 	"categorii": ["Jazz", "Bisericeasca", "Pop"]
+-- }
+-- ```
+
+-- (b) Prezentarea comenzilor pentru crearea bazei de date
+-- ```JS
+-- use liste_cantari; /// selecteaza sau creeaza baza de date daca nu exista
+-- db.createCollection("cantari"); 
+-- ```
+
+-- (c) Prezentarea comenzilor pentru inserarea, modificarea și ștergerea documentelor sau înregistrărilor
+-- ```JS
+-- db.cantari.insertOne({ nume: "NOI", gama: "D", bpm: 100 }); /// inserare
+-- db.cantari.updateOne({ nume: "NOI" }, { $set: { bpm: 110 } }); /// modificare
+-- db.cantari.deleteOne({ nume: "NOI" }); /// stergere
+-- ```
+
+-- (d) Exemplificarea comenzilor pentru interogarea datelor, incluzând operațiuni de filtrare și sortare
+-- ```JS
+-- db.cantari.find({ categorii: "Rock" }); /// catarile filtrate dupa categoria rock
+-- db.cantari.find({ bpm: { $gt: 90 } }).sort({ bpm: -1 }); /// cantarile cu bpm > 90 sortate descrescator
+-- ```

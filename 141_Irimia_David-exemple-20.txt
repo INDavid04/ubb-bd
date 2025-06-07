@@ -1,0 +1,81 @@
+------------------------------------------------------------------------------------------------------------------------
+-- 20. Cerință rezervată (flexibilă) pentru alte concepte studiate relevant pentru dezvoltarea aplicațiilor cu suport pentru baze de date.
+------------------------------------------------------------------------------------------------------------------------
+
+-- Functie de validare (returneaza 1 daca bpm este in [40, 200] si 0 in caz contrar)
+CREATE OR REPLACE FUNCTION VALIDARE_BPM(p_bpm NUMBER)
+RETURN NUMBER IS
+BEGIN
+  IF p_bpm < 40 OR p_bpm > 200 THEN
+    RETURN 0;
+  ELSE
+    RETURN 1;
+  END IF;
+END; 
+/ 
+-- `/` pentru a compila cu succes si a nu primi 'ORA-24344: A compilation error occurred while creating an object.'
+
+-- Tabel pentru audit
+DROP TABLE AUDIT_CANTARE;
+CREATE TABLE AUDIT_CANTARE (
+  ID_LOG NUMBER GENERATED ALWAYS AS IDENTITY,
+  ID_CANTARE NUMBER,
+  DATA_ACTIUNE DATE,
+  TIP_ACTIUNE VARCHAR(10),
+  UTILIZATOR VARCHAR(44)
+);
+
+-- Trigger de audit si validare
+CREATE OR REPLACE TRIGGER TRIGGER_CANTARE_AUDIT
+BEFORE INSERT OR UPDATE ON CANTARE
+FOR EACH ROW
+DECLARE
+  tip_actiune VARCHAR2(10);
+BEGIN
+  -- validare BPM
+  IF VALIDARE_BPM(:NEW.BPM) = 0 THEN
+    RAISE_APPLICATION_ERROR(-20001, 'BPM INVALID. Trebuie sa fie intre 40 si 200.');
+  END IF;
+
+  -- determinare tip acțiune
+  IF INSERTING THEN
+    tip_actiune := 'INSERT';
+  ELSIF UPDATING THEN
+    tip_actiune := 'UPDATE';
+  END IF;
+
+  -- logare in audit
+  INSERT INTO AUDIT_CANTARE(ID_CANTARE, DATA_ACTIUNE, TIP_ACTIUNE, UTILIZATOR)
+  VALUES (
+    :NEW.ID_CANTARE,
+    SYSDATE,
+    tip_actiune,
+    USER
+  );
+END;
+/
+
+-- Testarea functiei de validare
+SELECT VALIDARE_BPM(210) FROM DUAL;
+
+-- Inserarea unei cantari cu bpm < 40
+INSERT INTO CANTARE (ID_CANTARE, NUME, GAMA, BPM, ID_LISTA)
+VALUES (101, 'TEST CANTARE', 'A', 25, 32);
+
+-- Inserarea unei cantari cu bpm > 200
+INSERT INTO CANTARE (ID_CANTARE, NUME, GAMA, BPM, ID_LISTA)
+VALUES (101, 'TEST CANTARE', 'A', 220, 32);
+
+-- Inserarea unei cantari cu bpm in [40, 200]
+INSERT INTO CANTARE (ID_CANTARE, NUME, GAMA, BPM, ID_LISTA)
+VALUES (101, 'TEST CANTARE', 'A', 88, 32);
+
+-- Afisarea tabelului CANTARE
+SELECT * FROM CANTARE;
+
+-- Afisarea tabelului AUDIT_CANTARE
+SELECT ID_LOG, ID_CANTARE, TO_CHAR(DATA_ACTIUNE, 'YYYY-MM-DD, HH24:MM:SS'), TIP_ACTIUNE, UTILIZATOR
+FROM AUDIT_CANTARE;
+
+-- Stergerea cantarii cu id-ul 101
+DELETE FROM CANTARE WHERE ID_CANTARE = 101;
