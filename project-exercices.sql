@@ -2,13 +2,6 @@
 -- Proiect final, completări cerințe opționale - Due June 12, 2025 10:59 PM --
 ------------------------------------------------------------------------------
 
--- Încărcați: 
--- (a) Un fișier docx care să integreze toate rezolvările cerințelor 1-17; 
--- (b) Un fișier text care să conțină codul SQL pentru cerințele de la punctele 10-11(comenzile de creare a secvenței, a tabelelor și comenzile pentru inserarea datelor în aceste tabele); 
--- (c) Un fișier text care să conțină codul SQL pentru cerințele de la punctele 12-17; 
--- (d) Fișiere pentru subiectele suplimentare 18, 19, 20; 
--- (e) Subliniați modificările față de versiunea precedentă care contribuie la creșterea complexitații proiectului.
-
 ------------
 -- TABELE --
 ------------
@@ -181,6 +174,7 @@ WHERE ID_CANTARE = 80;
 ------------------------------------------------------------------------------------------------------------------------
 
 -- (a) O vizualizare complexa
+-- In limbaj natural, se afiseaza numele de utilizator, trupa, corul bisericii si numarul de membrii ai acesteia
 CREATE OR REPLACE VIEW V_UTILIZATOR_TRUPA_COR AS
 SELECT U.NUME AS "UTILIZATOR", T.NUME AS "TRUPA", B.NUME AS "CORUL BISERICII", C.NUMAR_MEMBRII AS "NUMAR MEMBRII"
 FROM UTILIZATOR U
@@ -189,13 +183,15 @@ JOIN COR C ON C.ID_COR = U.ID_COR
 JOIN BISERICA B ON B.ID_BISERICA = C.ID_BISERICA;
 
 -- (b) Un exemplu de operatie LMD permisa (Explicatie: Vizualizarea contine un singur tabel fiind posibila inserarea datelor)
-INSERT INTO V_TRUPE VALUES (101, 'TRUPA TEMPORARA', 1998);
--- Pentru vizualizarea urmatoare
+-- Pentru vizualizarea V_TRUPE
 CREATE OR REPLACE VIEW V_TRUPE AS SELECT * FROM TRUPA;
+-- Inseram o trupa temporara cu id-ul 101 si anul de debut 1998
+INSERT INTO V_TRUPE VALUES (101, 'TRUPA TEMPORARA', 1998);
 -- Mai jos putem sterge linia adaugata
 DELETE FROM V_TRUPE WHERE ID_TRUPA = 101;
 
--- (c) Un exemplu de operatie LMD nepermisa (Explicatie: Vizualizarea respectiva implica join pe patru tabele si nu este clar unde sa fie inserate datele)
+-- (c) Un exemplu de operatie LMD nepermisa
+-- In limbaj natural se vrea inserarea unui utilizator cu trupa, cor si numar de membrii in vizualizarea V_UTILIZATOR_TRUPA_COR, insa acest lucru nu este posibil, intrucat vizualizarea respectiva implica join pe patru tabele si nu este clar unde sa fie inserate datele
 INSERT INTO V_UTILIZATOR_TRUPA_COR VALUES ("IOAN TUDOR", "ELEVATION WORSHIP", "MARANATHA, CHICAGO", 20000);
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -242,38 +238,10 @@ FROM (
 -- (b) Prezentarea planului de execuție a unei cereri complexe, optimizare/compare plan alternativ folosind hint-uri și obiecte specifice optimizării cererilor (spre exemplu indecsi).  
 ------------------------------------------------------------------------------------------------------------------------
 
--- (a) Optimizarea unei cereri exprimate prin: expresie algebrica, arbore algebric si limbaj SQL, anterior si ulterior optimizarii
-
--- Expresia algebirca neoptimizata
--- select_{ID_TRUPA apartine (project_{ID_TRUPA}(select_{AN_DEBUT < 2010}(TRUPA)))} (UTILIZATOR)
-
--- Arborele algebric neoptimizat
--- select (ID_TRUPA apartine subquery) <-> UTILIZATOR <-> project ID_TRUPA <-> select AN_DEBUT < 2010 <-> TRUPA
-
--- Exemplu de cerere neoptimizata
-SELECT *
-FROM UTILIZATOR U
-WHERE U.ID_TRUPA IN (
-	SELECT T.ID_TRUPA
-	FROM TRUPA T
-	WHERE T.AN_DEBUT < 2010
-);
-
--- Expresia algebirca optimizata
--- select_{T.AN_DEBUT < 2010} (UTILIZATOR join TRUPA)
-
--- Arborele algebric optimizat
--- select T.AN_DEBUT < 2010 <-> UTILIZATOR JOIN TRUPA
-
--- Exemplu de cerere optimizata
-SELECT U.*
-FROM UTILIZATOR U
-JOIN TRUPA T ON T.ID_TRUPA = U.ID_TRUPA
-WHERE T.AN_DEBUT < 2010;
-
 -- (b) Prezentarea planului de execuție a unei cereri complexe, optimizare/compare plan alternativ folosind hint-uri și obiecte specifice optimizării cererilor (spre exemplu indecsi)
 
 -- Exemplu de o cerere complexa
+-- In limbaj natural: Afisati numele utilizatorului, a cantarii, precum si bpm-ul cantarii fiecarui utilizator, unde fiecare cantare are bpm-ul mai mare stric decat 90. Rezultatul va fi ordonat descrescator dupa bpm-ul cantarii.
 SELECT U.NUME, C.NUME AS CANTARE, C.BPM
 FROM UTILIZATOR U
 JOIN LISTA L ON L.ID_LISTA = U.ID_LISTA
@@ -351,41 +319,116 @@ SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
 
 -- (a) Prezentarea structurii baze de date de tip NoSql
 -- Structura unei baze de date de tip NoSql este flexibila in sensul ca nu mai trebuie ca toate randurile dintr-un tabel sa aiba aceleasi coloane.
-```JS
-{
-	"_id": ObjectId,
-	"nume": "DOMNUL MINUNILOR",
-	"gama": "G#",
-	"bpm": 120,
-	"autori": ["Sunny Tranca", "Miriam Popescu"],
-	"categorii": ["Jazz", "Bisericeasca", "Pop"]
-}
-```
+-- ```JS
+-- {
+-- 	"_id": ObjectId,
+-- 	"nume": "DOMNUL MINUNILOR",
+-- 	"gama": "G#",
+-- 	"bpm": 120,
+-- 	"autori": ["Sunny Tranca", "Miriam Popescu"],
+-- 	"categorii": ["Jazz", "Bisericeasca", "Pop"]
+-- }
+-- ```
 
 -- (b) Prezentarea comenzilor pentru crearea bazei de date
-```JS
-use liste_cantari; /// selecteaza sau creeaza baza de date daca nu exista
-db.createCollection("cantari"); 
-```
+-- ```JS
+-- use liste_cantari; /// selecteaza sau creeaza baza de date daca nu exista
+-- db.createCollection("cantari"); 
+-- ```
 
 -- (c) Prezentarea comenzilor pentru inserarea, modificarea și ștergerea documentelor sau înregistrărilor
-```JS
-db.cantari.insertOne({ nume: "NOI", gama: "D", bpm: 100 }); /// inserare
-db.cantari.updateOne({ nume: "NOI" }, { $set: { bpm: 110 } }); /// modificare
-db.cantari.deleteOne({ nume: "NOI" }); /// stergere
-```
+-- ```JS
+-- db.cantari.insertOne({ nume: "NOI", gama: "D", bpm: 100 }); /// inserare
+-- db.cantari.updateOne({ nume: "NOI" }, { $set: { bpm: 110 } }); /// modificare
+-- db.cantari.deleteOne({ nume: "NOI" }); /// stergere
+-- ```
 
 -- (d) Exemplificarea comenzilor pentru interogarea datelor, incluzând operațiuni de filtrare și sortare
-```JS
-db.cantari.find({ categorii: "Rock" }); /// catarile filtrate dupa categoria rock
-db.cantari.find({ bpm: { $gt: 90 } }).sort({ bpm: -1 }); /// cantarile cu bpm > 90 sortate descrescator
-```
+-- ```JS
+-- db.cantari.find({ categorii: "Rock" }); /// catarile filtrate dupa categoria rock
+-- db.cantari.find({ bpm: { $gt: 90 } }).sort({ bpm: -1 }); /// cantarile cu bpm > 90 sortate descrescator
+-- ```
 
 ------------------------------------------------------------------------------------------------------------------------
 -- 20. Cerință rezervată (flexibilă) pentru alte concepte studiate relevant pentru dezvoltarea aplicațiilor cu suport pentru baze de date.
 ------------------------------------------------------------------------------------------------------------------------
 
--- TODO: find something interesting here;
+-- Functie de validare (returneaza 1 daca bpm este in [40, 200] si 0 in caz contrar)
+CREATE OR REPLACE FUNCTION VALIDARE_BPM(p_bpm NUMBER)
+RETURN NUMBER IS
+BEGIN
+  IF p_bpm < 40 OR p_bpm > 200 THEN
+    RETURN 0;
+  ELSE
+    RETURN 1;
+  END IF;
+END; 
+/ 
+-- `/` pentru a compila cu succes si a nu primi 'ORA-24344: A compilation error occurred while creating an object.'
+
+-- Tabel pentru audit
+CREATE TABLE AUDIT_CANTARE (
+    ID_LOG NUMBER GENERATED ALWAYS AS IDENTITY,
+    ID_CANTARE NUMBER,
+    DATA_ACTIUNE DATE,
+    TIP_ACTIUNE VARCHAR(10),
+    UTILIZATOR VARCHAR(44)
+);
+
+-- Trigger de audit si validare
+CREATE OR REPLACE TRIGGER TRIGGER_CANTARE_AUDIT
+BEFORE INSERT OR UPDATE ON CANTARE
+FOR EACH ROW
+DECLARE
+  tip_actiune VARCHAR2(10);
+BEGIN
+  -- validare BPM
+  IF VALIDARE_BPM(:NEW.BPM) = 0 THEN
+    RAISE_APPLICATION_ERROR(-20001, 'BPM INVALID. Trebuie sa fie intre 40 si 200.');
+  END IF;
+
+  -- determinare tip acțiune
+  IF INSERTING THEN
+    tip_actiune := 'INSERT';
+  ELSIF UPDATING THEN
+    tip_actiune := 'UPDATE';
+  END IF;
+
+  -- logare in audit
+  INSERT INTO AUDIT_CANTARE(ID_CANTARE, DATA_ACTIUNE, TIP_ACTIUNE, UTILIZATOR)
+  VALUES (
+    :NEW.ID_CANTARE,
+    SYSDATE,
+    tip_actiune,
+    USER
+  );
+END;
+/
+
+-- Testarea functiei de validare
+SELECT VALIDARE_BPM(10) FROM DUAL;
+
+-- Afisarea tabelului AUDIT_CANTARE
+SELECT ID_LOG, ID_CANTARE, TO_CHAR(DATA_ACTIUNE, 'YYY-MM-DD, HH24:MM:SS'), TIP_ACTIUNE, UTILIZATOR
+FROM AUDIT_CANTARE;
+
+-- Inserarea unei cantari cu bpm < 40
+INSERT INTO CANTARE (ID_CANTARE, NUME, GAMA, BPM, ID_LISTA)
+VALUES (101, 'TEST CANTARE', 'A', 25, 32);
+
+-- Inserarea unei cantari cu bpm > 200
+INSERT INTO CANTARE (ID_CANTARE, NUME, GAMA, BPM, ID_LISTA)
+VALUES (101, 'TEST CANTARE', 'A', 220, 32);
+
+-- Inserarea unei cantari cu bpm in [40, 200]
+INSERT INTO CANTARE (ID_CANTARE, NUME, GAMA, BPM, ID_LISTA)
+VALUES (101, 'TEST CANTARE', 'A', 88, 32);
+
+-- Afisarea tabelului CANTARE
+SELECT * FROM CANTARE;
+
+-- Stergerea cantarii cu id-ul 101
+DELETE FROM CANTARE WHERE ID_CANTARE = 101;
 
 ------------------------------------------
 -- ASIDE: INTELEGE MODELUL DE REZOLVARE --
