@@ -23,7 +23,10 @@
 -- PREMIU (#id_premiu, loc_podium) 
 -- COMPETITIE (#id_competitie, nume, locatie) 
 
--- STERGEM VECHILE TABELE
+------------------------------------
+-- PENTRU A STERGE VECHILE TABELE --
+------------------------------------
+
 DROP TABLE UTILIZATOR;
 DROP TABLE VOCALIST;
 DROP TABLE INSTRUMENTIST;
@@ -38,9 +41,9 @@ DROP TABLE TRUPA;
 DROP TABLE PREMIU;
 DROP TABLE COMPETITIE;
 
--- ASIDE: STERGEM NISTE TABELE DE TEST (MICA OBSERVATIE: SE PARE CA E CASE-SENSITIVE :) )
--- DROP TABLE test;
--- DROP TABLE TEST;
+--------------------------------------------------
+-- PENTRU A STERGE SAU PENTRU A ADAUGA SECVENTA --
+--------------------------------------------------
 
 -- STERGEM VECHEA SECVENTA
 DROP SEQUENCE PROGRAM_SEQUENCE;
@@ -424,6 +427,10 @@ SELECT * FROM CATEGORIE;
 ---------------
 -- TEST ZONE --
 ---------------
+
+-- STERGEM NISTE TABELE DE TEST (MICA OBSERVATIE: SE PARE CA E CASE-SENSITIVE :) )
+-- DROP TABLE test;
+-- DROP TABLE TEST;
 
 SELECT * FROM TRUPA;
 SELECT * FROM PREMIU;
