@@ -113,17 +113,17 @@ FETCH FIRST 5 ROWS ONLY;
 
 -- (a) Schimba locatia unei liste unde sunt mai mult de 3 cântări
 -- In acest caz, modificam locatia programarii pentru lista cu id-ul 31, respectiv 34. Asta se intampla, deoarece aceste doua liste contin mai mult strict decat o singura cantare.
--- ID_CANTARE | ID_LISTA
--- 71 			31              1
--- 72 			37
--- 73 			34				2
--- 74 			32
--- 75 			39
--- 76 			31				1
--- 77 			36
--- 78 			33
--- 79 			34				2
--- 80 			40
+-- ID_CANTARE | ID_LISTA | contor
+-- 71 			    31         a1
+-- 72 			    37
+-- 73 			    34				 b1
+-- 74 			    32
+-- 75 			    39
+-- 76 			    31				 a2
+-- 77 			    36
+-- 78 			    33
+-- 79 			    34				 b2
+-- 80 			    40
 UPDATE LISTA
 SET LOCATIE_PROGRAMARE = 'BUCURESTI'
 WHERE ID_LISTA IN (
@@ -143,7 +143,7 @@ WHERE UPPER(CATEGORIE.DENUMIRE) = 'ROCK';
 INSERT INTO CATEGORIE(ID_CANTARE, DENUMIRE) VALUES (72, 'ROCK');
 INSERT INTO CATEGORIE(ID_CANTARE, DENUMIRE) VALUES (75, 'ROCK');
 
--- (c) Modifica gama in C si bpm in 80 pentru fiecare cantare care are bpm mai mic strict decat media aritmetica a bpm-ului tuturor cantarilor si se afla in gama G
+-- (c) Modifica gama in C si bpm in 80 pentru fiecare cantare care are bpm mai mic strict decat media aritmetica a bpm-ului tuturor cantarilor
 UPDATE CANTARE
 SET GAMA = 'C', BPM = 80
 WHERE BPM < (
@@ -225,12 +225,18 @@ WHERE NOT EXISTS (
 
 -- (c) O cerere care implementeaza analiza top n
 -- Cerinta: Sa se afiseze numele, gama si bpm-ul a top trei cantari care au bpm-ul cel mai mare
+-- Cu where rownum <= n:
 SELECT NUME, GAMA, BPM
 FROM (
 	SELECT *
 	FROM CANTARE
 	ORDER BY BPM DESC
 ) WHERE ROWNUM <= 3;
+-- Cu fetch first n rows only:
+SELECT NUME, GAMA, BPM
+FROM CANTARE
+ORDER BY BPM DESC
+FETCH FIRST 3 ROWS ONLY;
 
 ------------------------------------------------------------------------------------------------------------------------
 -- 16. La alegere: 
