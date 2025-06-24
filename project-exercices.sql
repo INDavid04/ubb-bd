@@ -544,3 +544,47 @@ WHERE NOT EXISTS (
         )
     )
 );
+
+-------------------------------------
+-- Doua probleme pentru prezentare --
+-------------------------------------
+
+------------
+-- TABELE --
+------------
+
+-- TRUPA (#id_trupa, nume, an_debut, id_utilizator) 
+-- PREMIU (#id_premiu, loc_podium) 
+-- COMPETITIE (#id_competitie, nume, locatie) 
+-- TRUPA_PREMIU_COMPETITIE (id_trupa, id_premiu, id_competitie)
+-- LISTA (#id_lista, id_cantare, id_utilizator, nume, data_programare, locatie_programare) 
+-- BISERICA (#id_biserica, nume) 
+-- COR (#id_cor, id_biserica, numar_membrii, id_utilizator) 
+-- UTILIZATOR (#id_utilizator, id_trupa, id_lista, id_cor, nume) 
+-- VOCALIST (#id_utilizator, rol) 
+-- INSTRUMENTIST (#id_utilizator) 
+-- INSTRUMENT (id_instrumentist, denumire) 
+-- CANTARE (#id_cantare, id_autor, id_lista, id_categorie, nume, gama, bpm) 
+-- AUTOR (#id_autor, id_cantare, nume, an_debut) 
+-- CATEGORIE (id_cantare, denumire) 
+
+-- 1. Tabelele create în proiect respectă cardinalitățile? Cum se implementeaza relatia many-to-many.
+
+-- 2. Trupele care au castigat cel putin doua premii. 
+
+SELECT T.NUME
+FROM TRUPA T
+LEFT OUTER JOIN TRUPA_PREMIU_COMPETITIE TPC ON TPC.ID_TRUPA = T.ID_TRUPA
+GROUP BY T.NUME
+HAVING COUNT(TPC.ID_PREMIU) >= 2; 
+
+SELECT * FROM TRUPA;
+SELECT * FROM TRUPA_PREMIU_COMPETITIE;
+
+-- SELECT TPC1.ID_TRUPA
+-- FROM TRUPA_PREMIU_COMPETITIE TPC1
+-- WHERE (
+--   SELECT COUNT(TPC2.ID_TRUPA)
+--   FROM TRUPA_PREMIU_COMPETITIE TPC2
+--   WHERE TPC2.ID_PREMIU = TPC1.ID_PREMIU;
+-- ) >= 2;
