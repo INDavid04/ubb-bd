@@ -111,7 +111,7 @@ FETCH FIRST 5 ROWS ONLY;
 -- 13. Implementarea a 3 operații de actualizare și de suprimare a datelor utilizând subcereri. 
 ------------------------------------------------------------------------------------------------------------------------
 
--- (a) Schimba locatia unei liste unde sunt mai mult de 3 cântări
+-- (a) Schimba locatia unei liste unde sunt mai mult de 2 cântări
 -- In acest caz, modificam locatia programarii pentru lista cu id-ul 31, respectiv 34. Asta se intampla, deoarece aceste doua liste contin mai mult strict decat o singura cantare.
 -- ID_CANTARE | ID_LISTA | contor
 -- 71 			    31         a1
